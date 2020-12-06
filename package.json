@@ -1,0 +1,22 @@
+{
+  "name": "tictactoe-admin-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itdat/tictactoe-admin-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/itdat/tictactoe-admin-server/issues"
+  },
+  "homepage": "https://github.com/itdat/tictactoe-admin-server#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
