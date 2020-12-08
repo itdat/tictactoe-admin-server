@@ -10,7 +10,7 @@ connectDB();
 app.use(express.json());
 
 //Define routes
-app.use("/register", require("./routes/index"));
+app.use("/admins", require("./routes/index"));
   
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
