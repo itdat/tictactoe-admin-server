@@ -7,114 +7,34 @@ const Admin = require("../models/Admin");
 const passport = require("passport");
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
+const adminController = require("./../controllers/adminController");
 //Register
-router.post("/register", async (req, res) => {
-  const { errors, isValid } = await validateRegisterInput(req.body);
-  if (!isValid) {
-    return res.status(400).json(errors);
-  }
-  const { name, username, password } = req.body;
-  try {
-    let user = await Admin.findOne({ username });
-    if (user) {
-      return res.status(400).json({ msg: "Username already exists" });
-    } else {
-      const newAdmin = new Admin({
-        name: name,
-        username: username,
-        password: password,
-      });
-      bcrypt.genSalt(10, (err, salt) => {
-        if (err) console.error("There was an error", err);
-        else {
-          bcrypt.hash(newAdmin.password, salt, (err, hash) => {
-            if (err) console.error("There was an error", err);
-            else {
-              newAdmin.password = hash;
-              newAdmin.save().then((user) => {
-                res.status(200).json(user);
-              });
-            }
-          });
-        }
-      });
-    }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+router.route("/register").post(adminController.Register);
 
 //Login
-router.post("/login", async (req, res) => {
-  const { errors, isValid } = await validateLoginInput(req.body);
-
-  if (!isValid) {
-    return res.status(400).json(errors);
-  }
-
-  const username = req.body.username;
-  const password = req.body.password;
-  try {
-    let admin = await Admin.findOne({ username });
-    if (!admin) {
-      errors.email = "User not found";
-      return res.status(404).json(errors);
-    }
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Incorrect password" });
-    }
-    const payload = {
-      id: admin.id,
-      name: admin.name,
-    };
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      {
-        expiresIn: 3600,
-      },
-      (err, token) => {
-        if (err) console.error("There is some error in token", err);
-        else {
-          res.json({
-            success: true,
-            token: `Bearer ${token}`,
-          });
-        }
-      }
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+router.route("/login").post(adminController.Login);
 
 //Login with Facebook
-router.get("/login/facebook", passport.authenticate("facebook"));
+router.route("/login/facebook").get(passport.authenticate("facebook"));
 
-router.get(
-  "/login/facebook/callback",
+router.route("/login/facebook/callback").get(
   passport.authenticate("facebook", {
     successRedirect: "/",
-    failureRedirect: "/fail",
+    failureRedirect: "https://tictactoe-admin.netlify.app/login",
   })
 );
 
 // Login with Google
-router.get(
-  "/login/google",
+router.route("/login/google").get(
   passport.authenticate("google", {
     scope: ["profile"],
   })
 );
 
-router.get(
-  "/login/google/callback",
+router.route("/login/google/callback").get(
   passport.authenticate("google", {
     successRedirect: "/",
-    failureRedirect: "/login",
+    failureRedirect: "https://tictactoe-admin.netlify.app/login",
   })
 );
 
